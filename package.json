@@ -1,0 +1,16 @@
+{
+  "name": "e2e-licensed-app",
+  "version": "1.0.0",
+  "description": "Small Express app for end-to-end testing that requires a licence key at startup",
+  "main": "src/server.js",
+  "private": true,
+  "scripts": {
+    "start": "node src/server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
