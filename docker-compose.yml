@@ -4,4 +4,5 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - APP_LICENCE_KEY
+      # Optional. Unset or empty: the app uses its built-in test licence.
+      - APP_LICENCE_KEY=${APP_LICENCE_KEY:-}

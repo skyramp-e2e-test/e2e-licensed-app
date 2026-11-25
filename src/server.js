@@ -12,10 +12,13 @@ function fail(message) {
   process.exit(1);
 }
 
+// APP_LICENCE_KEY is optional. Without it the app runs on a built-in test licence: a harmless default
+// for testing, not a real key (it unlocks nothing and is never compared with the hash above).
 function validateLicence() {
   const key = process.env.APP_LICENCE_KEY;
-  if (key === undefined || key === '') {
-    fail('Missing required environment variable APP_LICENCE_KEY');
+  if (key === undefined || key.trim() === '') {
+    console.log('APP_LICENCE_KEY is not set: using the built-in test licence (a test default, not a real key).');
+    return 'test';
   }
 
   const digest = crypto.createHash('sha256').update(key, 'utf8').digest();
@@ -23,9 +26,10 @@ function validateLicence() {
   if (!crypto.timingSafeEqual(digest, expected)) {
     fail('APP_LICENCE_KEY is invalid');
   }
+  return 'valid';
 }
 
-validateLicence();
+const licence = validateLicence();
 
 const app = express();
 const startedAt = new Date();
@@ -45,7 +49,7 @@ app.get('/', (req, res) => {
 </head>
 <body>
   <h1 id="title">E2E Licensed App</h1>
-  <p id="licence-status">Licence: valid</p>
+  <p id="licence-status">Licence: ${licence === 'test' ? 'test (built-in default)' : 'valid'}</p>
   <ul>
     <li><a href="/api/status">/api/status</a></li>
     <li><a href="/health">/health</a></li>
@@ -57,7 +61,7 @@ app.get('/', (req, res) => {
 app.get('/api/status', (req, res) => {
   res.json({
     status: 'ok',
-    licence: 'valid',
+    licence,
     startedAt: startedAt.toISOString(),
     uptimeSeconds: Math.round(process.uptime()),
   });
